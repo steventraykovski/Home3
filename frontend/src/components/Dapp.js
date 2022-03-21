@@ -19,6 +19,8 @@ import { TransactionErrorMessage } from "./TransactionErrorMessage";
 import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
 import { NoTokensMessage } from "./NoTokensMessage";
 
+import { login } from './login-user';
+
 // This is the Hardhat Network id, you might change it in the hardhat.config.js.
 // If you are using MetaMask, be sure to change the Network id to 1337.
 // Here's a list of network ids https://docs.metamask.io/guide/ethereum-provider.html#properties
@@ -38,6 +40,13 @@ const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
 // Note that (3) and (4) are specific of this sample application, but they show
 // you how to keep your Dapp and contract's state in sync,  and how to send a
 // transaction.
+
+export function apiLogin() {
+  
+    login();
+  
+}
+
 export class Dapp extends React.Component {
   constructor(props) {
     super(props);
@@ -58,6 +67,8 @@ export class Dapp extends React.Component {
 
     this.state = this.initialState;
   }
+
+  
 
   render() {
     // Ethereum wallets inject the window.ethereum object. If it hasn't been
@@ -93,6 +104,26 @@ export class Dapp extends React.Component {
     return (
       <div className="container p-4">
         <div className="row">
+
+        <div>
+        <div>My Profile</div>
+
+        <div>Profiles here</div>
+
+        <div>Create section</div>
+
+        <div>
+        <button
+            className=""
+            type="button"
+            onClick={apiLogin}
+          >
+            API Login
+          </button>
+        </div>
+
+    </div>
+
           <div className="col-12">
             <h1>
               {this.state.tokenData.name} ({this.state.tokenData.symbol})
