@@ -1,5 +1,4 @@
 const getParamOrExit = (name: string) => {
-  console.log(process.env);
   const param = process.env["REACT_APP_" + name];
   if (!param) {
     console.error(`Required config param '${name}' missing`);
