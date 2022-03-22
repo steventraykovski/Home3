@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from "react";
 import {
   Box,
@@ -10,25 +9,52 @@ import {
   Avatar,
   HStack,
   Divider,
+  Image,
 } from "@chakra-ui/react";
 import { Error } from "./error";
 import { Loading } from "./loading";
-import axios from "axios";
 import { useQuery, useLazyQuery, useMutation } from "@apollo/client";
 import { GET_PROFILES } from "../queries/getProfiles";
-import { CREATE_PROFILE } from "../queries/createProfile";
 import { createProfile } from "../actions/createProfileActions";
+import { ethers } from "ethers";
+import { ChevronDownIcon } from "@chakra-ui/icons";
+import metamaskHorizontal from "../constants/images/metamask-fox-wordmark-horizontal.svg";
+import metamaskStacked from "../constants/images/metamask-fox-wordmark-stacked.svg";
+declare var window: any;
+const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+type profileType = {
+  bio: string;
+  handle: string;
+  id: string;
+  ownedBy: string;
+  picture: string;
+};
 export const Profiles = () => {
-  // const [loading, setLoading] = useState(true);
-  const [address, setAddress] = useState(
-    "0x6F234Fa20558743970ccEBD6AF259fCB49eeA73c"
-  );
+  const [address, setAddressState] = useState("");
+  const [createdSuccess, setCreatedSuccess] = useState(false);
+  const connectUsersMeta = async () => {
+    const accounts = await window.ethereum.request({
+      method: "eth_requestAccounts",
+    });
+    return accounts[0];
+  };
+  let handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    let account0 = await connectUsersMeta();
+    setAddressState(account0);
+  };
+
+  window.ethereum.on("accountsChanged", function (accounts: Array<string>) {
+    setAddressState(accounts[0]);
+  });
   const [createProfData, setCreateProfData] = useState("");
 
   const handleCreate = async () => {
     const data = await createProfile(address);
-    setCreateProfData(data);
-    alert("Success!", data);
+    alert("Successfully create new profile!");
+    // setTimeout("2000");
+    // setCreatedSuccess(true);
   };
 
   const { loading, error, data } = useQuery(GET_PROFILES, {
@@ -39,6 +65,38 @@ export const Profiles = () => {
     },
     skip: address === "",
   });
+  console.log(data);
+  if (!address.length) {
+    return (
+      <Box>
+        <Flex justifyContent="center" alignItems="center" height="800px">
+          <VStack>
+            <Box bg={"green.400"} boxSize={"200px"}>
+              <Text
+                textColor="whiteAlpha.900"
+                textAlign={"center"}
+                py="55px"
+                fontWeight={"900"}
+                px="20px"
+              >
+                Please connect your MetaMask wallet to see your profiles!
+              </Text>
+              <Text textColor={"whiteAlpha.800"} textAlign={"center"}></Text>
+            </Box>
+            <ChevronDownIcon boxSize={"50px"} />
+            <Button
+              onClick={handleSubmit}
+              bg={"blackAlpha.600"}
+              boxSize={"175px"}
+              maxH={"55px"}
+            >
+              <Image src={metamaskHorizontal} />
+            </Button>
+          </VStack>
+        </Flex>
+      </Box>
+    );
+  }
   if (loading) {
     return <Loading />;
   } else if (error) {
@@ -51,7 +109,8 @@ export const Profiles = () => {
             <Heading size={"xs"} pl={"10px"} pt={"10px"}>
               My Profiles
             </Heading>
-            {data.profiles.items.map((profile) => {
+            {data.profiles.items.map((profile: profileType) => {
+              console.log(profile);
               return (
                 <Box p="3" key={profile.id}>
                   <HStack>
@@ -67,7 +126,7 @@ export const Profiles = () => {
             <Flex justifyContent={"center"} alignItems={"center"} py={"20px"}>
               <Button
                 onClick={handleCreate}
-                bg={"lightgreen"}
+                bg={"green.400"}
                 color="whiteAlpha.900"
               >
                 Create

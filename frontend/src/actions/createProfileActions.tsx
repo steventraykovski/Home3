@@ -59,5 +59,5 @@ export const createProfile = async (address: string) => {
 
   console.log("profile id", BigNumber.from(profileId).toHexString());
 
-  return result.data;
+  return result;
 };
