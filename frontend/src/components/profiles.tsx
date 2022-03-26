@@ -20,6 +20,8 @@ import { ethers } from "ethers";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import metamaskHorizontal from "../constants/images/metamask-fox-wordmark-horizontal.svg";
 import metamaskStacked from "../constants/images/metamask-fox-wordmark-stacked.svg";
+import { ProfileView } from "./profileView";
+
 declare var window: any;
 const provider = new ethers.providers.Web3Provider(window.ethereum);
 
@@ -33,6 +35,11 @@ type profileType = {
 export const Profiles = () => {
   const [address, setAddressState] = useState("");
   const [createdSuccess, setCreatedSuccess] = useState(false);
+
+  // adding state variable for activeProfile - set by clicking on a profile to view it
+
+  const [activeProfile, setActiveProfile] = useState("");
+
   const connectUsersMeta = async () => {
     const accounts = await window.ethereum.request({
       method: "eth_requestAccounts",
@@ -56,6 +63,13 @@ export const Profiles = () => {
     // setTimeout("2000");
     // setCreatedSuccess(true);
   };
+
+  const setProfile = (id: string) => {
+    console.log("Profile data from setProfile funct", id);
+
+    setActiveProfile(id);
+    console.log("Active Profile", activeProfile);
+};
 
   const { loading, error, data } = useQuery(GET_PROFILES, {
     variables: {
@@ -101,7 +115,20 @@ export const Profiles = () => {
     return <Loading />;
   } else if (error) {
     return <Error />;
-  } else if (data) {
+  } 
+  
+  //adding in condition to pull profile view component if a profile has been set
+
+  else if (activeProfile) {
+
+    let launchProfile = activeProfile;
+
+    return <ProfileView dataFromParent1 = {address} dataFromParent2 = {launchProfile} />;
+    
+  }
+
+  
+  else if (data) {
     return (
       <Flex justifyContent={"center"} alignItems={"center"} height={"800px"}>
         <VStack>
@@ -116,6 +143,15 @@ export const Profiles = () => {
                   <HStack>
                     <Avatar name={profile.picture} src="" />
                     <Text>{profile.handle}</Text>
+
+                  
+                    <Button onClick={() => setProfile(profile.id)}
+                      bg={"blue.100"}
+                      color="whiteAlpha.900"
+                    >
+                    View
+                    </Button>
+
                   </HStack>
                 </Box>
               );
